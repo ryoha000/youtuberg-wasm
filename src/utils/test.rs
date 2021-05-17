@@ -62,3 +62,38 @@ pub fn cmp_vec<T: std::cmp::Eq>(src: &[T], dst: &[T]) -> bool {
     }
     true
 }
+
+#[cfg(test)]
+pub fn get_visualized_labels(labels: &[u32], binary: &(u32, u32, Vec<bool>), side: u32, ignore_labels: &[u32]) -> RgbaImage {
+    use rand::prelude::*;
+    let mut rng = thread_rng();
+    if rng.gen() {}
+    let mut img: RgbaImage = ImageBuffer::new(binary.0, binary.1);
+    let max_label = labels.iter().max().unwrap();
+    let cols = binary.0 / side;
+    let mut label_colors: Vec<(u8, u8, u8)> = vec![(0, 0, 0); *max_label as usize + 1];
+    for i in 0..labels.len() {
+        if ignore_labels.iter().any(|&x| x == labels[i]) {
+            continue
+        }
+        if label_colors[labels[i] as usize].0 == 0 {
+            label_colors[labels[i] as usize].0 = rng.gen_range(1..=255);
+            label_colors[labels[i] as usize].1 = rng.gen_range(1..=255);
+            label_colors[labels[i] as usize].2 = rng.gen_range(1..=255);
+        }
+        let (r, g, b) = label_colors[labels[i] as usize];
+        let row = i as u32 / cols;
+        let col = i as u32 % cols;
+        for k in (row * side)..(std::cmp::min((row + 1) * side, binary.1)) {
+            for l in (col * side)..(std::cmp::min((col + 1) * side, binary.0)) {
+                let mut pixel = img[(l, k)];
+                pixel[0] = r;
+                pixel[1] = g;
+                pixel[2] = b;
+                pixel[3] = 255;
+                img.put_pixel(l, k, pixel)
+            }
+        }
+    }
+    img
+}
