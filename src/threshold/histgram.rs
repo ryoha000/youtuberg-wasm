@@ -1,4 +1,4 @@
-pub fn get_hist(gray: &Vec<u8>) -> [u32; 256] {
+pub fn get_hist(gray: &[u8]) -> [u32; 256] {
     let mut hist: [u32; 256] = [0; 256];
     for i in gray {
         hist[*i as usize] += 1;

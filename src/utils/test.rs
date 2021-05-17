@@ -49,3 +49,16 @@ pub fn image_diff_ratio(img: RgbaImage, dst_file: &str) -> f32 {
     }
     diff as f32 / (width as f32 * height as f32)
 }
+
+#[cfg(test)]
+pub fn cmp_vec<T: std::cmp::Eq>(src: &[T], dst: &[T]) -> bool {
+    if src.len() != dst.len() {
+        return false
+    }
+    for i in 0..src.len() {
+        if src[i] != dst[i] {
+            return false
+        }
+    }
+    true
+}
