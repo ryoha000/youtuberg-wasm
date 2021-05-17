@@ -13,3 +13,17 @@ pub fn gray_to_binary(gray: &Vec<u8>) -> Vec<bool> {
     }
     binary
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::utils::test;
+    #[test]
+    fn can_gray_to_binary() {
+        let (width, height, gray) = test::load_gray_image();
+        let binary = gray_to_binary(&gray);
+        let binary_img = test::binary_to_image((width, height, binary));
+        let diff = test::image_diff_ratio(binary_img, "opencv_binary");
+        assert!(diff < 0.03, "diff({}) over 3%", diff);
+    }
+}
