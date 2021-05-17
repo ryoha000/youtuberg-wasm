@@ -23,6 +23,32 @@ pub fn get_around_indexes(index: u32, binary: &(u32, u32, Vec<bool>)) -> Vec<usi
     result
 }
 
+// TODO: ここでやってる処理はlabelsを組み立てるときにできるはず
+pub fn get_contrours_from_labels(labels: &[u32], binary: &(u32, u32, Vec<bool>)) -> Vec<bool> {
+    let mut contrours = vec![false; labels.len()];
+    for i in 0..labels.len() {
+        contrours[i] = false;
+        if labels[i] == 0 {
+            continue
+        }
+        let indexes = get_around_indexes(i as u32, &binary);
+        if indexes.len() != 4 {
+            contrours[i] = true;
+        }
+        let mut is_edge = false;
+        for j in 0..indexes.len() {
+            if labels[indexes[j]] == 0 {
+                is_edge = true;
+                break;
+            }
+        }
+        if is_edge {
+            contrours[i] = true;
+        }
+    }
+    contrours
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
