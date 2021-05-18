@@ -1,5 +1,17 @@
 pub mod test;
 
+pub struct DividedBinary {
+    pub labels: Vec<u32>,
+    pub contrours: Vec<bool>,
+    pub areas: Vec<u32>,
+    pub sizes: Vec<DividedSize>,
+}
+
+pub struct DividedSize {
+    pub rows: u32,
+    pub cols: u32,
+}
+
 pub struct Grid {
     pub rows: usize,
     pub cols: usize,

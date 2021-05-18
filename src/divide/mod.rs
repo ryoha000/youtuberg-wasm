@@ -1,24 +1,12 @@
-mod utils;
+use crate::utils;
 
-pub struct DividedBinary {
-    pub labels: Vec<u32>,
-    pub contrours: Vec<bool>,
-    pub areas: Vec<u32>,
-    pub sizes: Vec<DividedSize>,
-}
-
-pub struct DividedSize {
-    pub rows: u32,
-    pub cols: u32,
-}
-
-pub fn get_divided_binary(binary: &(u32, u32, Vec<bool>)) -> DividedBinary {
+pub fn get_divided_binary(binary: &(u32, u32, Vec<bool>)) -> utils::DividedBinary {
     let mut group_id = 1;
     let mut labels = vec![0; (binary.0 * binary.1) as usize];
     let mut areas = Vec::new();
     areas.push(0);
     let mut sizes = Vec::new();
-    sizes.push(DividedSize{ rows: 0, cols: 0 });
+    sizes.push(utils::DividedSize{ rows: 0, cols: 0 });
     for i in 0..binary.2.len() {
         // もう、このマスが探索されてたらスキップ
         if labels[i] != 0 {
@@ -76,11 +64,11 @@ pub fn get_divided_binary(binary: &(u32, u32, Vec<bool>)) -> DividedBinary {
             to_check_indexes = new_to_check_indexes;
         }
         areas.push(area);
-        sizes.push(DividedSize{ rows: max_index as u32 / binary.0 - min_index as u32 / binary.0 + 1, cols: max_col - min_col + 1 });
+        sizes.push(utils::DividedSize{ rows: max_index as u32 / binary.0 - min_index as u32 / binary.0 + 1, cols: max_col - min_col + 1 });
         group_id += 1;
     }
     let contrours = utils::get_contrours_from_labels(&labels, &binary);
-    DividedBinary{
+    utils::DividedBinary{
         labels: labels, contrours: contrours, areas: areas, sizes: sizes
     }
 }

@@ -1,4 +1,4 @@
-use super::divide::DividedBinary;
+use super::utils::DividedBinary;
 
 // block_sideは文字サイズと同じという想定
 pub fn get_filtered_binary(divided_binary: &DividedBinary, block_side: u32) -> Vec<bool> {
