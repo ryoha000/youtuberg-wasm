@@ -64,7 +64,7 @@ pub fn cmp_vec<T: std::cmp::Eq>(src: &[T], dst: &[T]) -> bool {
 }
 
 #[cfg(test)]
-pub fn get_visualized_labels(labels: &[u32], binary: &(u32, u32, Vec<bool>), side: u32, ignore_labels: &[u32]) -> RgbaImage {
+pub fn get_visualized_labels(labels: &[u32], binary: &(u32, u32, &[bool]), side: u32, ignore_labels: &[u32]) -> RgbaImage {
     use rand::prelude::*;
     let mut rng = thread_rng();
     if rng.gen() {}

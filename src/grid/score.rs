@@ -1,6 +1,6 @@
 use crate::utils::Grid;
 
-pub fn get_grid_scores(binary: &(u32, u32, Vec<bool>), grid: &Grid, side: usize) -> Vec<u32> {
+pub fn get_grid_scores(binary: &(u32, u32, &[bool]), grid: &Grid, side: usize) -> Vec<u32> {
     let mut result = Vec::with_capacity(grid.rows * grid.cols);
     for row in 0..grid.rows {
         for col in 0..grid.cols {
@@ -23,11 +23,12 @@ mod tests {
     use super::*;
     #[test]
     fn all_0_scores() {
-        let binary = (5, 3, vec![
+        let vec = vec![
             false,false,false,false,false,
             false,false,false,false,false,
             false,false,false,false,false,
-        ]);
+        ];
+        let binary: (u32, u32, &[bool]) = (5, 3, &vec);
         let side = 1;
         let grid = Grid{ rows: (binary.1 as f32 / side as f32).ceil() as usize, cols: (binary.0 as f32 / side as f32).ceil() as usize};
         let scores = get_grid_scores(&binary, &grid, side);
@@ -38,11 +39,12 @@ mod tests {
 
     #[test]
     fn all_1_scores() {
-        let binary = (5, 3, vec![
+        let vec = vec![
             true,true,true,true,true,
             true,true,true,true,true,
             true,true,true,true,true,
-        ]);
+        ];
+        let binary: (u32, u32, &[bool]) = (5, 3, &vec);
         let side = 1;
         let grid = Grid{ rows: (binary.1 as f32 / side as f32).ceil() as usize, cols: (binary.0 as f32 / side as f32).ceil() as usize};
         let scores = get_grid_scores(&binary, &grid, side);
@@ -53,11 +55,12 @@ mod tests {
 
     #[test]
     fn can_get_surplus_scores() {
-        let binary = (5, 3, vec![
+        let vec = vec![
             true,   true,   true,   false,  true,
             true,   false,  false,  true,   false,
             false,  false,  true,   false,  true,
-        ]);
+        ];
+        let binary: (u32, u32, &[bool]) = (5, 3, &vec);
         let side = 2;
         let grid = Grid{ rows: (binary.1 as f32 / side as f32).ceil() as usize, cols: (binary.0 as f32 / side as f32).ceil() as usize};
         let scores = get_grid_scores(&binary, &grid, side);

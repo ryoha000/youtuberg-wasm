@@ -33,7 +33,7 @@ mod tests {
     fn can_noise_filter() {
         let (width, height, gray) = test::load_gray_image();
         let binary = crate::threshold::gray_to_binary(&gray);
-        let divided_binary = get_divided_binary(&(width, height, binary));
+        let divided_binary = get_divided_binary(&(width, height, &binary));
         let noise_filtered_binary = get_filtered_binary(&divided_binary, width / 40);
         test::binary_to_image((width, height, noise_filtered_binary));
     }

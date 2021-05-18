@@ -1,6 +1,6 @@
 use crate::utils;
 
-pub fn get_divided_binary(binary: &(u32, u32, Vec<bool>)) -> utils::DividedBinary {
+pub fn get_divided_binary(binary: &(u32, u32, &[bool])) -> utils::DividedBinary {
     let mut group_id = 1;
     let mut labels = vec![0; (binary.0 * binary.1) as usize];
     let mut areas = Vec::new();
@@ -81,8 +81,7 @@ mod tests {
     fn can_get_divided_binary() {
         let (width, height, gray) = test::load_gray_image();
         let binary = crate::threshold::gray_to_binary(&gray);
-        let b_copy = binary.clone();
-        let divided_binary = get_divided_binary(&(width, height, binary));
-        test::get_visualized_labels(&divided_binary.labels, &(width, height, b_copy), 1, &vec![0]);
+        let divided_binary = get_divided_binary(&(width, height, &binary));
+        test::get_visualized_labels(&divided_binary.labels, &(width, height, &binary), 1, &vec![0]);
     }
 }
