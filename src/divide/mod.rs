@@ -1,22 +1,24 @@
 mod utils;
 
 pub struct DividedBinary {
-    labels: Vec<u32>,
-    contrours: Vec<bool>,
-    areas: Vec<u32>,
-    sizes: Vec<DividedSize>,
+    pub labels: Vec<u32>,
+    pub contrours: Vec<bool>,
+    pub areas: Vec<u32>,
+    pub sizes: Vec<DividedSize>,
 }
 
 pub struct DividedSize {
-    rows: u32,
-    cols: u32,
+    pub rows: u32,
+    pub cols: u32,
 }
 
 pub fn get_divided_binary(binary: &(u32, u32, Vec<bool>)) -> DividedBinary {
     let mut group_id = 1;
     let mut labels = vec![0; (binary.0 * binary.1) as usize];
     let mut areas = Vec::new();
+    areas.push(0);
     let mut sizes = Vec::new();
+    sizes.push(DividedSize{ rows: 0, cols: 0 });
     for i in 0..binary.2.len() {
         // もう、このマスが探索されてたらスキップ
         if labels[i] != 0 {
