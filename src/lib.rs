@@ -4,6 +4,7 @@ use wasm_bindgen::prelude::*;
 mod threshold;
 mod divide;
 mod utils;
+mod filter;
 
 #[wasm_bindgen]
 extern {
