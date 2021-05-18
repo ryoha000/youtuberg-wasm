@@ -4,6 +4,7 @@ pub fn get_divided_binary(binary: &(u32, u32, Vec<bool>)) -> utils::DividedBinar
     let mut group_id = 1;
     let mut labels = vec![0; (binary.0 * binary.1) as usize];
     let mut areas = Vec::new();
+    let size = utils::ImageSize{ width: binary.0 as usize, height: binary.1 as usize };
     areas.push(0);
     let mut sizes = Vec::new();
     sizes.push(utils::DividedSize{ rows: 0, cols: 0 });
@@ -16,7 +17,7 @@ pub fn get_divided_binary(binary: &(u32, u32, Vec<bool>)) -> utils::DividedBinar
         let value = binary.2[i];
         labels[i] = group_id;
         // そのループで探索するindexが入ってる配列
-        let mut to_check_indexes = utils::get_around_indexes(i as u32, &binary);
+        let mut to_check_indexes = utils::get_around_indexes(i, &size);
 
         let mut area = 1;
         let col = i as u32 % binary.0;
@@ -58,7 +59,7 @@ pub fn get_divided_binary(binary: &(u32, u32, Vec<bool>)) -> utils::DividedBinar
                     max_index = to_check_indexes[j];
                 }
 
-                new_to_check_indexes.append(&mut utils::get_around_indexes(to_check_indexes[j] as u32, &binary));
+                new_to_check_indexes.append(&mut utils::get_around_indexes(to_check_indexes[j], &size));
                 area += 1;
             }
             to_check_indexes = new_to_check_indexes;
@@ -67,9 +68,8 @@ pub fn get_divided_binary(binary: &(u32, u32, Vec<bool>)) -> utils::DividedBinar
         sizes.push(utils::DividedSize{ rows: max_index as u32 / binary.0 - min_index as u32 / binary.0 + 1, cols: max_col - min_col + 1 });
         group_id += 1;
     }
-    let contrours = utils::get_contrours_from_labels(&labels, &binary);
     utils::DividedBinary{
-        labels: labels, contrours: contrours, areas: areas, sizes: sizes
+        labels: labels, areas: areas, sizes: sizes
     }
 }
 

@@ -1,5 +1,10 @@
 pub mod test;
 
+pub struct GridLabel {
+    pub labels: Vec<u32>,
+    pub contrours: Vec<bool>,
+}
+
 pub struct DividedBinary {
     pub labels: Vec<u32>,
     pub contrours: Vec<bool>,
@@ -17,40 +22,45 @@ pub struct Grid {
     pub cols: usize,
 }
 
-pub fn get_around_indexes(index: u32, binary: &(u32, u32, Vec<bool>)) -> Vec<usize> {
+pub struct ImageSize {
+    pub width: usize,
+    pub height: usize,
+}
+
+pub fn get_around_indexes(index: usize, size: &ImageSize) -> Vec<usize> {
     // TODO: ここ一々配列をアロケートしてるのをなんとかする
     let mut result = Vec::new();
-    let bottom = index + binary.0;
+    let bottom = index + size.width;
     let right = index + 1;
 
     // ちゃんとindex内にあるかチェック
-    if index >= binary.0 {
-        result.push((index - binary.0) as usize);
+    if index >= size.width {
+        result.push((index - size.width) as usize);
     }
-    if bottom < binary.1 * binary.0 {
+    if bottom < size.height * size.width {
         result.push(bottom as usize);
     }
     if index >= 1 {
         let left = index - 1;
-        if left % binary.0 != 0 {
+        if left % size.width != 0 {
             result.push(left as usize);
         }
     }
-    if right % binary.0 != 0 && right < binary.1 * binary.0 {
+    if right % size.width != 0 && right < size.height * size.width {
         result.push(right as usize);
     }
     result
 }
 
 // TODO: ここでやってる処理はlabelsを組み立てるときにできるはず
-pub fn get_contrours_from_labels(labels: &[u32], binary: &(u32, u32, Vec<bool>)) -> Vec<bool> {
+pub fn get_contrours_from_labels(labels: &[u32], size: &ImageSize) -> Vec<bool> {
     let mut contrours = vec![false; labels.len()];
     for i in 0..labels.len() {
         contrours[i] = false;
         if labels[i] == 0 {
             continue
         }
-        let indexes = get_around_indexes(i as u32, &binary);
+        let indexes = get_around_indexes(i, size);
         if indexes.len() != 4 {
             contrours[i] = true;
         }
@@ -73,10 +83,8 @@ mod tests {
     use super::*;
     use crate::utils::test;
     #[test]
-    fn can_get_correct_indexes_of_edge() {
-        let binary = (10, 10, vec![]);
-        
-        let indexes = get_around_indexes(0, &binary);
+    fn can_get_correct_indexes_of_edge() {        
+        let indexes = get_around_indexes(0, &ImageSize{ width: 10, height: 10 });
         let correct = vec![10, 1];
         assert!(test::cmp_vec(&indexes, &correct), "indexes({:?}) not equal {:?}", indexes, correct);
     }
@@ -84,7 +92,7 @@ mod tests {
     fn can_get_around_indexes_of_center() {
         let binary = (10, 10, vec![]);
 
-        let indexes = get_around_indexes(55, &binary);
+        let indexes = get_around_indexes(55, &ImageSize{ width: 10, height: 10 });
         let correct = vec![45, 65, 54, 56];
         assert!(test::cmp_vec(&indexes, &correct), "indexes({:?}) not equal {:?}", indexes, correct);
     }
