@@ -77,11 +77,12 @@ pub fn get_divided_binary(binary: &(u32, u32, &[bool])) -> utils::DividedBinary 
 mod tests {
     use super::*;
     use crate::utils::test;
+    use crate::utils;
     #[test]
     fn can_get_divided_binary() {
         let (width, height, gray) = test::load_gray_image();
         let binary = crate::threshold::gray_to_binary(&gray);
         let divided_binary = get_divided_binary(&(width, height, &binary));
-        test::get_visualized_labels(&divided_binary.labels, &(width, height, &binary), 1, &vec![0]);
+        test::get_visualized_labels(&divided_binary.labels, &(width, height, &binary), 1, &utils::Grid{ rows: 1, cols: 1 }, &vec![0]);
     }
 }
