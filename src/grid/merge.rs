@@ -105,3 +105,164 @@ pub fn fill_missing_grid(labels: &mut [u32], grid: &utils::Grid) {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn not_exist_expected_index() {
+        let grid = utils::Grid{ rows: 3, cols: 6 };
+        let is_exist = is_exist_expected_index(&grid, 6, 5);
+        assert_eq!(is_exist, false);
+        let is_exist = is_exist_expected_index(&grid, 5, 6);
+        assert_eq!(is_exist, false);
+        let is_exist = is_exist_expected_index(&grid, 5, 12);
+        assert_eq!(is_exist, false);
+    }
+    #[test]
+    fn exist_expected_index() {
+        let grid = utils::Grid{ rows: 3, cols: 6 };
+        let is_exist = is_exist_expected_index(&grid, 6, 7);
+        assert_eq!(is_exist, true);
+        let is_exist = is_exist_expected_index(&grid, 7, 6);
+        assert_eq!(is_exist, true);
+        let is_exist = is_exist_expected_index(&grid, 6, 13);
+        assert_eq!(is_exist, true);
+    }
+    #[test]
+    fn not_update_gls_when_same_label() {
+        let mut grid_labels = utils::GridLabel{ labels: vec![1, 3, 1, 1, 3, 3], contrours: vec![false, true, false, false, true, true] };
+        let scores = vec![1, 1, 1, 1, 1, 1];
+        let threshold = 0;
+        let index = 5;
+        let group_id = grid_labels.labels[index];
+        let buried_indexes = vec![2, 3];
+        let grid = utils::Grid{ rows: 1, cols: 6 };
+        update_grid_labels(&mut grid_labels, &grid, &scores, index, 1, threshold, &buried_indexes);
+        for i in buried_indexes {
+            assert_ne!(grid_labels.labels[i], group_id);
+        }
+    }
+    #[test]
+    fn not_update_gls_when_all_do_not_over() {
+        let mut grid_labels = utils::GridLabel{ labels: vec![1, 2, 1, 1, 3, 3], contrours: vec![false, true, false, false, true, true] };
+        let scores = vec![1, 4, 1, 1, 4, 4];
+        let threshold = 2;
+        let index = 5;
+        let group_id = grid_labels.labels[index];
+        let buried_indexes = vec![2, 3];
+        let grid = utils::Grid{ rows: 1, cols: 6 };
+        update_grid_labels(&mut grid_labels, &grid, &scores, index, 1, threshold, &buried_indexes);
+        for i in buried_indexes {
+            assert_ne!(grid_labels.labels[i], group_id);
+        }
+    }
+    #[test]
+    fn check_update_gls() {
+        let mut grid_labels = utils::GridLabel{ labels: vec![1, 2, 1, 1, 3, 3], contrours: vec![false, true, false, false, true, true] };
+        let scores = vec![1, 4, 1, 1, 4, 4];
+        let threshold = 0;
+        let index = 5;
+        let group_id = grid_labels.labels[index];
+        let buried_indexes = vec![2, 3];
+        let grid = utils::Grid{ rows: 1, cols: 6 };
+        update_grid_labels(&mut grid_labels, &grid, &scores, index, 1, threshold, &buried_indexes);
+        for i in buried_indexes {
+            assert_eq!(grid_labels.labels[i], group_id);
+            assert_eq!(grid_labels.contrours[i], true);
+        }
+    }
+    #[test]
+    fn check_update_gls_and_fill_same_label() {
+        let mut grid_labels = utils::GridLabel{ labels: vec![
+                1, 2, 1, 1, 3, 3,
+                1, 2, 2, 1, 1, 1,
+            ], contrours: vec![
+                false, true, false, false,  true,  true,
+                false, true,  true, false, false, false,
+            ] };
+        let scores = vec![
+            1, 4, 1, 1, 4, 4,
+            1, 4, 4, 1, 1, 1,
+        ];
+        let threshold = 0;
+        let index = 5;
+        let buried_indexes = vec![2, 3];
+        let grid = utils::Grid{ rows: 2, cols: 6 };
+        update_grid_labels(&mut grid_labels, &grid, &scores, index, 1, threshold, &buried_indexes);
+        let expected_labels = vec![
+            1, 3, 3, 3, 3, 3,
+            1, 3, 3, 1, 1, 1,
+        ];
+        for i in 0..expected_labels.len() {
+            assert_eq!(grid_labels.labels[i], expected_labels[i]);
+        }
+    }
+
+    #[test]
+    fn check_get_merged_gls() {
+        let mut grid_labels = utils::GridLabel{ labels: vec![
+                1, 2, 1, 1, 3, 1,
+                1, 2, 2, 1, 1, 4,
+                1, 1, 1, 1, 1, 4,
+                1, 5, 5, 1, 1, 1,
+            ], contrours: vec![
+                false,  true, false, false,  true, false,
+                false,  true,  true, false, false,  true,
+                false, false, false, false, false,  true,
+                false,  true,  true, false, false, false,
+            ] };
+        let scores = vec![
+            1, 4, 1, 1, 4, 1,
+            1, 4, 4, 1, 1, 4,
+            1, 1, 1, 1, 1, 4,
+            1, 4, 4, 1, 1, 1,
+        ];
+        let threshold = 0;
+        let grid = utils::Grid{ rows: 4, cols: 6 };
+        get_merged_grid_labels(&mut grid_labels, &scores, &grid, threshold);
+        let expected_labels = vec![
+            1, 2, 2, 2, 2, 2,
+            1, 2, 2, 1, 2, 2,
+            1, 1, 1, 1, 1, 2,
+            1, 5, 5, 1, 1, 1,
+        ];
+        for i in 0..expected_labels.len() {
+            assert_eq!(grid_labels.labels[i], expected_labels[i], "index: {}, actual: {:?}, expected: {:?}", i, grid_labels.labels, expected_labels);
+        }
+    }
+
+    #[test]
+    fn not_fill_missing_grid() {
+        let mut labels = vec![3, 1, 1, 1, 1, 3];
+        let expected_labels = labels.clone();
+        let grid = utils::Grid{ rows: 1, cols: 6 };
+        fill_missing_grid(&mut labels, &grid);
+        for i in 0..expected_labels.len() {
+            assert_eq!(labels[i], expected_labels[i], "index: {}, actual: {:?}, expected: {:?}", i, labels, expected_labels);
+        }
+    }
+    #[test]
+    fn not_fill_missing_grid_when_new_line() {
+        let mut labels = vec![
+            1, 1, 1, 1, 1, 3,
+            1, 1, 3, 1, 1, 1,
+        ];
+        let expected_labels = labels.clone();
+        let grid = utils::Grid{ rows: 2, cols: 6 };
+        fill_missing_grid(&mut labels, &grid);
+        for i in 0..expected_labels.len() {
+            assert_eq!(labels[i], expected_labels[i], "index: {}, actual: {:?}, expected: {:?}", i, labels, expected_labels);
+        }
+    }
+    #[test]
+    fn check_fill_missing_grid() {
+        let mut labels = vec![3, 1, 1, 1, 3, 1];
+        let grid = utils::Grid{ rows: 1, cols: 6 };
+        fill_missing_grid(&mut labels, &grid);
+        let expected_labels = vec![3, 3, 3, 3, 3, 1];
+        for i in 0..expected_labels.len() {
+            assert_eq!(labels[i], expected_labels[i], "index: {}, actual: {:?}, expected: {:?}", i, labels, expected_labels);
+        }
+    }
+}
