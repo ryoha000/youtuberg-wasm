@@ -1,17 +1,23 @@
 use crate::utils;
 
+// TODO: この関数なんとかする
 pub fn get_merged_grid_labels(grid_labels: &mut utils::GridLabel, scores: &[u32], grid: &utils::Grid, threshold: u32) {
     for i in 0..grid_labels.labels.len(){
         if !grid_labels.contrours[i]  {
             continue
         }
+        // ○○○○●○○○○
         // ○○○●○●○○○
         // ●●●○○○●●●
         // ○○○●○●○○○
+        // ○○○○●○○○○
         // ●部分を探索
         let group_id = grid_labels.labels[i];
         if group_id == 1 {
             continue
+        }
+        if i > i - grid.cols * 2 {
+            update_grid_labels(grid_labels, grid, scores, i, i - grid.cols * 2, threshold, &vec![i - grid.cols]);
         }
         if i >= grid.cols + 1 {
             update_grid_labels(grid_labels, grid, scores, i, i - grid.cols - 1, threshold, &vec![i - 1, i - grid.cols]);
@@ -35,6 +41,7 @@ pub fn get_merged_grid_labels(grid_labels: &mut utils::GridLabel, scores: &[u32]
             update_grid_labels(grid_labels, grid, scores, i, i + grid.cols - 1, threshold, &vec![i - 1, i + grid.cols]);
         }
         update_grid_labels(grid_labels, grid, scores, i, i + grid.cols + 1, threshold, &vec![i + 1, i + grid.cols]);
+        update_grid_labels(grid_labels, grid, scores, i, i + grid.cols * 2, threshold, &vec![i + grid.cols]);
     }
 }
 
