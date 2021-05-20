@@ -16,7 +16,7 @@ pub fn get_merged_grid_labels(grid_labels: &mut utils::GridLabel, scores: &[u32]
         if group_id == 1 {
             continue
         }
-        if i > i - grid.cols * 2 {
+        if i > grid.cols * 2 {
             update_grid_labels(grid_labels, grid, scores, i, i - grid.cols * 2, threshold, &vec![i - grid.cols]);
         }
         if i >= grid.cols + 1 {
@@ -212,18 +212,18 @@ mod tests {
                 1, 2, 1, 1, 3, 1,
                 1, 2, 2, 1, 1, 4,
                 1, 1, 1, 1, 1, 4,
-                1, 5, 5, 1, 1, 1,
+                5, 1, 1, 1, 1, 1,
             ], contrours: vec![
                 false,  true, false, false,  true, false,
                 false,  true,  true, false, false,  true,
                 false, false, false, false, false,  true,
-                false,  true,  true, false, false, false,
+                 true, false, false, false, false, false,
             ] };
         let scores = vec![
             1, 4, 1, 1, 4, 1,
             1, 4, 4, 1, 1, 4,
             1, 1, 1, 1, 1, 4,
-            1, 4, 4, 1, 1, 1,
+            4, 1, 1, 1, 1, 1,
         ];
         let threshold = 0;
         let grid = utils::Grid{ rows: 4, cols: 6 };
@@ -232,7 +232,7 @@ mod tests {
             1, 2, 2, 2, 2, 2,
             1, 2, 2, 1, 2, 2,
             1, 1, 1, 1, 1, 2,
-            1, 5, 5, 1, 1, 1,
+            5, 1, 1, 1, 1, 1,
         ];
         for i in 0..expected_labels.len() {
             assert_eq!(grid_labels.labels[i], expected_labels[i], "index: {}, actual: {:?}, expected: {:?}", i, grid_labels.labels, expected_labels);
